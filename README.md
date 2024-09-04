@@ -12,7 +12,7 @@ This FastAPI application provides an API endpoint to identify unknown concepts i
 1. **Clone the repository**:
 
    ```bash
-   git[ clone <repository-url>](https://github.com/biodivportal/unknown_concepts_api.git)
+   git clone https://github.com/biodivportal/unknown_concepts_api.git
    cd unknown_concepts_api
    
 2. **Install the dependencies**:
