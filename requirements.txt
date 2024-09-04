@@ -1,0 +1,5 @@
+fastapi
+uvicorn==0.30.6
+pydantic==2.8.2
+langchain-openai
+langchain-community
