@@ -8,7 +8,9 @@ from templates.prompt_template import (
     PROMPT_TEMPLATE_ANNOTATION,
     PROMPT_TEMPLATE_SYNONYM,
     PROMPT_TEMPLATE_CONCEPTS,
-    PROMPT_TEMPLATE_ONTO
+    PROMPT_TEMPLATE_ONTO,
+    PROMPT_TEMPLATE_ONTO_DEFINITION,
+    PROMPT_TEMPLATE_SYNONYM_DEFINITION
 )
 
 # Suppress warnings if necessary
@@ -48,7 +50,7 @@ class OpenAI:
             logger.error(f"Error generating concepts: {e}")
             return []
 
-    def get_unknown_concepts_LLM(self, text: str, known_concepts: list) -> list:
+    def get_unknown_concepts_LLM_definition_synonym_ontologies(self, text: str, known_concepts: list) -> list:
         try:
             final_concepts = []
             concepts = self.get_concept_LLM(text)
@@ -64,9 +66,36 @@ class OpenAI:
             logger.error(f"Error identifying unknown concepts: {e}")
             return []
 
-    def find_fitting_ontology(self, concept: str, definition: str) -> str:
+    def get_unknown_concepts_LLM(self, text: str, known_concepts: list) -> list:
         try:
-            prompt = PROMPT_TEMPLATE_ONTO.format(class_name=concept, definition=definition)
+            final_concepts = []
+            concepts = self.get_concept_LLM(text)
+
+            # Filter out known concepts
+            unknown_concepts = [concept for concept in concepts if concept not in known_concepts]
+
+            for concept in unknown_concepts:
+                final_concepts.append(concept)
+
+            return final_concepts
+        except Exception as e:
+            logger.error(f"Error identifying unknown concepts: {e}")
+            return []
+
+    def find_fitting_ontology_with_definition(self, concept: str, definition: str) -> str:
+        try:
+            prompt = PROMPT_TEMPLATE_ONTO_DEFINITION.format(class_name=concept, definition=definition)
+            messages = [HumanMessage(content=prompt)]
+            response = self.llm(messages)
+            logger.info(f"Ontology found: {response.content}")
+            return response.content
+        except Exception as e:
+            logger.error(f"Error finding fitting ontology: {e}")
+            return ""
+
+    def find_fitting_ontology(self, concept: str) -> str:
+        try:
+            prompt = PROMPT_TEMPLATE_ONTO.format(class_name=concept)
             messages = [HumanMessage(content=prompt)]
             response = self.llm(messages)
             logger.info(f"Ontology found: {response.content}")
@@ -81,9 +110,9 @@ class OpenAI:
 
             return {
                 "originalLabel": concept,
-                "synonym": self.generate_synonym(concept, llm_definition),
+                "synonym": self.generate_synonym_with_definition(concept, llm_definition),
                 "links": {
-                    "ontology": self.find_fitting_ontology(concept, llm_definition),
+                    "ontology": self.find_fitting_ontology_with_definition(concept, llm_definition),
                 },
                 "@id": '1234',
                 "suggested_description": llm_definition,
@@ -102,9 +131,19 @@ class OpenAI:
             logger.error(f"Error generating definition for concept '{concept}': {e}")
             return ""
 
-    def generate_synonym(self, concept: str, definition: str) -> str:
+    def generate_synonym_with_definition(self, concept: str, definition: str) -> str:
         try:
-            prompt = PROMPT_TEMPLATE_SYNONYM.format(class_name=concept, definition=definition)
+            prompt = PROMPT_TEMPLATE_SYNONYM_DEFINITION.format(class_name=concept, definition=definition)
+            messages = [HumanMessage(content=prompt)]
+            response = self.llm(messages)
+            return response.content
+        except Exception as e:
+            logger.error(f"Error generating synonym for concept '{concept}': {e}")
+            return ""
+
+    def generate_synonym(self, concept: str) -> str:
+        try:
+            prompt = PROMPT_TEMPLATE_SYNONYM.format(class_name=concept)
             messages = [HumanMessage(content=prompt)]
             response = self.llm(messages)
             return response.content

@@ -5,6 +5,10 @@ This FastAPI application provides an API endpoint to identify unknown concepts i
 ## Features
 
 - **Identify Unknown Concepts**: Extract unknown concepts from text by comparing them against a list of known concepts.
+- **Match Concepts to Ontologies**: Extract unknown concepts from text by comparing them against a list of known concepts.
+- **Create Definitions for Concepts**: Extract unknown concepts from text by comparing them against a list of known concepts.
+- **Create Synonyms for Concepts**: Extract unknown concepts from text by comparing them against a list of known concepts.
+- **Full Unknown Concepts Pipeline**: Extract unknown concepts from text by comparing them against a list of known concepts. Provide synonyms, definitions, and fitting ontologies for all of them. 
 - **Development Mode**: Easily test the API with a static response by enabling development mode via a query parameter.
 
 ## Installation
